@@ -1,0 +1,37 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{{ product.name }} | Детали товара{% endblock %}
+
+{% block content %}
+<div class="row bg-white p-5 rounded-3 shadow-sm">
+    <!-- Блок для изображения -->
+    <div class="col-md-6 text-center">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ product.name }}"
+             style="max-height: 400px; object-fit: cover;">
+        {% else %}
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
+             style="height: 300px;">
+            <h3>Нет фото</h3>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Блок с описанием и ценой -->
+    <div class="col-md-6 d-flex flex-column justify-content-between">
+        <div>
+            <h1 class="display-5 fw-bold text-body-emphasis">{{ product.name }}</h1>
+            <hr>
+            <p class="fs-5 text-muted">{{ product.description }}</p>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-primary mb-3">Цена: {{ product.price }} руб.</h3>
+            <!-- Кнопка возврата на главную страницу -->
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4 rounded-pill">
+                &larr; Назад в каталог
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
