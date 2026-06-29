@@ -1,0 +1,20 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="p-5 text-center bg-white rounded-3 shadow-sm mb-4">
+    <h1 class="text-danger fw-bold">Удаление товара</h1>
+    <p class="fs-5 text-muted mt-3">
+        Вы уверены, что хотите безвозвратно удалить товар <strong>"{{ object.name }}"</strong>?
+    </p>
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger px-4 rounded-pill me-2">
+            Да, удалить
+        </button>
+        <a href="{% url 'product_detail' object.pk %}" class="btn btn-outline-secondary px-4 rounded-pill">
+            Отмена
+        </a>
+    </form>
+</div>
+{% endblock %}

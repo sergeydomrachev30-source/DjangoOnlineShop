@@ -1,14 +1,16 @@
-from django.views.generic import (
-    ListView,
-    CreateView,
-    DetailView,
-    UpdateView,
-    DeleteView,
-)
-from blog.models import Blog
-from django.urls import reverse_lazy
 import os
+
 from django.conf import settings
+from django.urls import reverse_lazy
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
+
+from blog.models import Blog
 
 
 class BlogListView(ListView):
@@ -38,7 +40,7 @@ class BlogDetailView(DetailView):
         obj.save()
 
         if obj.views_count == 100:
-            # Получаем путь к папке из settings.py (или используем по умолчанию)
+            # Получаем путь к папке из settings.py
             log_dir = getattr(settings, "EMAIL_FILE_PATH", "tmp/app-messages")
             os.makedirs(log_dir, exist_ok=True)
 
@@ -48,8 +50,7 @@ class BlogDetailView(DetailView):
                 f.write("Кому: my-email@yandex.ru\n")
                 f.write("Тема: Поздравляем с достижением! \n\n")
                 f.write(
-                    f'Ваша статья "{obj.title}" набрала '
-                    f'ровно 100 просмотров! Вы супер!\n'
+                    f'Ваша статья "{obj.title}" набрала ' f"ровно 100 просмотров!\n"
                 )
 
         return obj

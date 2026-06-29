@@ -28,8 +28,16 @@
         <div class="mt-4">
             <h3 class="text-primary mb-3">Цена: {{ product.price }} руб.</h3>
             <!-- Кнопка возврата на главную страницу -->
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4 rounded-pill">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4 rounded-pill me-2">
                 &larr; Назад в каталог
+            </a>
+            <!-- Кнопка редактирования товара -->
+            <a href="{% url 'update_product' product.pk %}" class="btn btn-warning px-4 rounded-pill me-2">
+                Редактировать
+            </a>
+            <!-- Кнопка удаления товара -->
+            <a href="{% url 'delete_product' product.pk %}" class="btn btn-danger px-4 rounded-pill">
+                Удалить
             </a>
         </div>
     </div>
