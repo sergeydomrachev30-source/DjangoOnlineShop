@@ -1,10 +1,21 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{% url 'home' %}">Online Store</a>
-        <div class="navbar-nav">
+        <div class="navbar-nav me-auto">
             <a class="nav-link" href="{% url 'home' %}">Главная</a>
-            <a class="nav-link" href="{% url 'create_product' %}">Добавить товар</a>
             <a class="nav-link" href="{% url 'contacts' %}">Контакты</a>
+        </div>
+        <div class="navbar-nav ms-auto">
+            <!-- Проверяем, залогинен ли пользователь -->
+            {% if user.is_authenticated %}
+                <span class="navbar-text text-white me-3">Привет, {{ user.email }}!</span>
+                <a class="nav-link" href="{% url 'create_product' %}">Добавить товар</a>
+                <a class="nav-link text-info" href="{% url 'users:profile' %}">Профиль</a>
+            <!-- Если пользователь аноним -->
+            {% else %}
+                <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+                <a class="nav-link" href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
         </div>
     </div>
 </nav>
