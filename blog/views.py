@@ -1,14 +1,10 @@
 import os
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    UpdateView,
-)
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
 
 from blog.models import Blog
 
@@ -22,11 +18,12 @@ class BlogListView(ListView):
         return Blog.objects.filter(is_published=True)
 
 
-class BlogCreateView(CreateView):
+class BlogCreateView(PermissionRequiredMixin, CreateView):
     model = Blog
     template_name = "blog/blog_form.html"
     fields = ["title", "content", "image", "is_published"]
     success_url = reverse_lazy("blog:list")
+    permission_required = "blog.add_blog"
 
 
 class BlogDetailView(DetailView):
@@ -56,16 +53,18 @@ class BlogDetailView(DetailView):
         return obj
 
 
-class BlogUpdateView(UpdateView):
+class BlogUpdateView(PermissionRequiredMixin, UpdateView):
     model = Blog
     template_name = "blog/blog_form.html"
     fields = ["title", "content", "image", "is_published"]
+    permission_required = "blog.change_blog"
 
     def get_success_url(self):
         return reverse_lazy("blog:detail", kwargs={"pk": self.object.pk})
 
 
-class BlogDeleteView(DeleteView):
+class BlogDeleteView(PermissionRequiredMixin, DeleteView):
     model = Blog
     template_name = "blog/blog_confirm_delete.html"
     success_url = reverse_lazy("blog:list")
+    permission_required = "blog.delete_blog"

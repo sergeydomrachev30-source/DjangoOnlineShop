@@ -4,6 +4,9 @@
         <div class="navbar-nav me-auto">
             <a class="nav-link" href="{% url 'home' %}">Главная</a>
             <a class="nav-link" href="{% url 'contacts' %}">Контакты</a>
+
+            <!-- ССЫЛКА НА БЛОГ -->
+            <a class="nav-link" href="{% url 'blog:list' %}">Блог</a>
         </div>
         <div class="navbar-nav ms-auto">
             <!-- Проверяем, залогинен ли пользователь -->

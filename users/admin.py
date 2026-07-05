@@ -1,0 +1,32 @@
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
+from users.models import User
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+
+    ordering = ("email",)
+
+    list_display = ("email", "is_staff", "is_active")
+    search_fields = ("email",)
+
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+    )
+
+    # Наш красивый горизонтальный фильтр со стрелочками!
+    filter_horizontal = ("groups", "user_permissions")

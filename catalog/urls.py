@@ -1,6 +1,7 @@
 from django.urls import path
 
 from catalog import views
+from catalog.views import ProductModeratorUpdateView
 
 urlpatterns = [
     path("", views.ProductListView.as_view(), name="home"),
@@ -18,5 +19,10 @@ urlpatterns = [
         "products/<int:pk>/delete/",
         views.ProductDeleteView.as_view(),
         name="delete_product",
+    ),
+    path(
+        "products/<int:pk>/moderate/",
+        ProductModeratorUpdateView.as_view(),
+        name="product_moderator_update",
     ),
 ]

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row bg-white p-5 rounded-3 shadow-sm">
-    <!-- Блок для изображения -->
+    <!-- Блок для изображения (левая колонка) -->
     <div class="col-md-6 text-center">
         {% if product.image %}
         <img src="{{ product.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ product.name }}"
@@ -17,7 +17,7 @@
         {% endif %}
     </div>
 
-    <!-- Блок с описанием и ценой -->
+    <!-- Блок с описанием, ценой и кнопками (правая колонка) -->
     <div class="col-md-6 d-flex flex-column justify-content-between">
         <div>
             <h1 class="display-5 fw-bold text-body-emphasis">{{ product.name }}</h1>
@@ -25,20 +25,35 @@
             <p class="fs-5 text-muted">{{ product.description }}</p>
         </div>
 
-        <div class="mt-4">
+       <div class="mt-4">
             <h3 class="text-primary mb-3">Цена: {{ product.price }} руб.</h3>
+
             <!-- Кнопка возврата на главную страницу -->
             <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4 rounded-pill me-2">
                 &larr; Назад в каталог
             </a>
+
             <!-- Кнопка редактирования товара -->
+            {% if product.owner == user or perms.catalog.can_unpublish_product or user.is_superuser %}
             <a href="{% url 'update_product' product.pk %}" class="btn btn-warning px-4 rounded-pill me-2">
                 Редактировать
             </a>
+            {% endif %}
+
+            <!-- Кнопка для модератора (Проверка по названию группы, правам или админу) -->
+            {% if "Модератор продуктов" in user.groups.all.0.name or "Модератор продуктов" in user.groups.all.1.name or perms.catalog.can_unpublish_product or user.is_superuser %}
+            <a href="{% url 'product_moderator_update' product.pk %}"
+               class="btn btn-info px-4 rounded-pill me-2 text-white">
+                Модерация статуса
+            </a>
+            {% endif %}
+
             <!-- Кнопка удаления товара -->
+            {% if product.owner == user or perms.catalog.delete_product or perms.delete_product or user.is_superuser %}
             <a href="{% url 'delete_product' product.pk %}" class="btn btn-danger px-4 rounded-pill">
                 Удалить
             </a>
+            {% endif %}
         </div>
     </div>
 </div>

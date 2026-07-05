@@ -72,3 +72,9 @@ class ProductForm(forms.ModelForm):
             raise forms.ValidationError("Разрешены только форматы JPEG (jpg) и PNG.")
 
         return image
+
+
+class ProductModeratorForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ("is_published",)

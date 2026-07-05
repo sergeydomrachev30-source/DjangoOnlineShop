@@ -1,16 +1,13 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.contrib.auth.mixins import (LoginRequiredMixin,
+                                        PermissionRequiredMixin)
+from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    UpdateView,
-)
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
 
-from catalog.forms import ProductForm
+from catalog.forms import ProductForm, ProductModeratorForm
 from catalog.models import Contacts, Product
 
 
@@ -58,6 +55,12 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     form_class = ProductForm
     success_url = reverse_lazy("home")
 
+    def form_valid(self, form):
+        product = form.save(commit=False)
+        product.owner = self.request.user
+        product.save()
+        return super().form_valid(form)
+
 
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
     model = Product
@@ -65,8 +68,46 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ProductForm
     success_url = reverse_lazy("home")
 
+    def get(self, request, *args, **kwargs):
+        product = get_object_or_404(Product, pk=kwargs.get("pk"))
+        if product.owner != request.user and not request.user.is_superuser:
+            return HttpResponseForbidden("Вы не являетесь владельцем этого продукта.")
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Достаем товар из базы по его первичному ключу (pk) и проверяем,
+        является ли текущий пользователь владельцем"""
+        product = get_object_or_404(Product, pk=kwargs.get("pk"))
+        if product.owner != request.user and not request.user.is_superuser:
+            return HttpResponseForbidden("Вы не являетесь владельцем этого продукта.")
+        return super().post(request, *args, **kwargs)
+
+
+class ProductModeratorUpdateView(PermissionRequiredMixin, UpdateView):
+    model = Product
+    template_name = "catalog/create_product.html"
+    form_class = ProductModeratorForm
+    permission_required = "catalog.can_unpublish_product"
+    success_url = reverse_lazy("home")
+
 
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
     model = Product
     template_name = "catalog/confirm_delete_product.html"
     success_url = reverse_lazy("home")
+
+    def get(self, request, *args, **kwargs):
+        product = get_object_or_404(Product, pk=kwargs.get("pk"))
+        if product.owner != request.user and not request.user.has_perm(
+            "catalog.delete_product"
+        ):
+            return HttpResponseForbidden("У вас нет прав для удаления этого продукта.")
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        product = get_object_or_404(Product, pk=kwargs.get("pk"))
+        if product.owner != request.user and not request.user.has_perm(
+            "catalog.delete_product"
+        ):
+            return HttpResponseForbidden("У вас нет прав для удаления этого продукта.")
+        return super().post(request, *args, **kwargs)
