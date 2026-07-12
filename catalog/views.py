@@ -1,14 +1,21 @@
-from django.contrib.auth.mixins import (LoginRequiredMixin,
-                                        PermissionRequiredMixin)
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView)
+from django.views.decorators.cache import cache_page
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from catalog.forms import ProductForm, ProductModeratorForm
 from catalog.models import Contacts, Product
+from catalog.services import get_all_products, get_products_by_category
 
 
 class ProductListView(ListView):
@@ -16,6 +23,9 @@ class ProductListView(ListView):
     template_name = "catalog/home.html"
     context_object_name = "products_list"
     paginate_by = 2
+
+    def get_queryset(self):
+        return get_all_products()
 
 
 class ContactsView(View):
@@ -43,6 +53,7 @@ class ContactsView(View):
         return render(request, "catalog/contacts.html", context=context)
 
 
+@method_decorator(cache_page(60 * 15), name="dispatch")
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = "catalog/product_detail.html"
@@ -111,3 +122,13 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
         ):
             return HttpResponseForbidden("У вас нет прав для удаления этого продукта.")
         return super().post(request, *args, **kwargs)
+
+
+class CategoryProductListView(ListView):
+    model = Product
+    template_name = "catalog/category_products.html"
+    context_object_name = "products_list"
+
+    def get_queryset(self):
+        category_id = self.kwargs.get("category_id")
+        return get_products_by_category(category_id)

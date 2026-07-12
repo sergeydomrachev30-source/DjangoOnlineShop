@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
 from config import settings
+
 # 1. ДОБАВИЛИ UserLoginForm В ИМПОРТ:
 from users.forms import UserLoginForm, UserProfileForm, UserRegisterForm
 

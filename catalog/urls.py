@@ -25,4 +25,9 @@ urlpatterns = [
         ProductModeratorUpdateView.as_view(),
         name="product_moderator_update",
     ),
+    path(
+        "category/<int:category_id>/",
+        views.CategoryProductListView.as_view(),
+        name="category_products",
+    ),
 ]
