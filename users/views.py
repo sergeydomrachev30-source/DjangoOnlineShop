@@ -6,7 +6,8 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
 from config import settings
-from users.forms import UserProfileForm, UserRegisterForm
+# 1. ДОБАВИЛИ UserLoginForm В ИМПОРТ:
+from users.forms import UserLoginForm, UserProfileForm, UserRegisterForm
 
 
 class RegisterView(CreateView):
@@ -18,7 +19,7 @@ class RegisterView(CreateView):
         user = form.save()
         send_mail(
             subject="Добро пожаловать в наш Интернет магазин",
-            message=f"Привер, {user.email}! Спасибо за регистрацию на нашем сайте.",
+            message=f"Привет, {user.email}! Спасибо за регистрацию на нашем сайте.",
             from_email=getattr(settings, "EMAIL_HOST_USER", "no-reply@shop.com"),
             recipient_list=[user.email],
             fail_silently=False,
@@ -27,6 +28,8 @@ class RegisterView(CreateView):
 
 
 class UserLoginView(LoginView):
+    # 2. ПОДКЛЮЧИЛИ ФОРМУ ДЛЯ ВХОДА ПО EMAIL:
+    form_class = UserLoginForm
     template_name = "users/login.html"
 
 

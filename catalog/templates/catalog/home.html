@@ -10,38 +10,51 @@
         </a>
     </div>
 </div>
+
 <!-- Сетка для карточек товаров Bootstrap -->
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for product in products_list %}
-    <div class="col">
-        <div class="card h-100 shadow-sm">
-            <!-- 1. Изображение товара -->
-            {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
-                 style="height: 200px; object-fit: cover;">
-            {% else %}
-            <div class="bg-secondary text-white text-center py-5"
-                 style="height: 200px;">Нет фото
-            </div>
-            {% endif %}
+        <!-- Отображаем товар только если он опубликован, либо если его смотрит владелец/модератор/админ -->
+        {% if product.is_published or product.owner == user or perms.catalog.can_unpublish_product or user.is_superuser %}
+        <div class="col">
+            <div class="card h-100 shadow-sm position-relative">
 
-            <div class="card-body">
-                <!-- 2. Название -->
-                <h5 class="card-title">{{ product.name }}</h5>
+                <!-- Визуальный маркер черновика для владельца и модератора -->
+                {% if not product.is_published %}
+                <span class="position-absolute top-0 start-0 m-2 badge bg-warning text-dark">Черновик</span>
+                {% endif %}
 
-                <!-- 3. Обрезанное описание -->
-                <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                <!-- 1. Изображение товара -->
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                     style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary text-white text-center py-5"
+                     style="height: 200px;">Нет фото
+                </div>
+                {% endif %}
 
-                <!-- 4. Цена -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-bold fs-5">{{ product.price }} руб.</span>
-                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-outline-primary">Посмотреть</a>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- 2. Название -->
+                        <h5 class="card-title">{{ product.name }}</h5>
+
+                        <!-- 3. Обрезанное описание -->
+                        <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                    </div>
+
+                    <!-- 4. Цена -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="text-bold fs-5">{{ product.price }} руб.</span>
+                        <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-outline-primary">Посмотреть</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        {% endif %}
     {% endfor %}
 </div>
+
 <!-- Навигация по страницам (Пагинация) -->
 <nav class="mt-5 d-flex justify-content-center">
     <ul class="pagination shadow-sm rounded-pill">
