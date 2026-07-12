@@ -1,0 +1,39 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-4">
+        <h2>Товары в выбранной категории</h2>
+    </div>
+</div>
+
+<div class="row">
+    {# Запускаем цикл по нашему списку продуктов из кэша Redis / БД #}
+    {% for product in products_list %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        Нет фото
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-truncate">{{ product.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">{{ product.price }} руб.</span>
+                        <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-outline-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        {# Этот блок сработает, если в категории нет ни одного товара #}
+        <div class="col-12 text-center">
+            <p class="alert alert-warning">В этой категории пока нет товаров.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
